@@ -1,0 +1,34 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Distribution / packaging
+.Python
+build/
+dist/
+sdist/
+wheels/
+*.egg-info/
+*.egg
+MANIFEST
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+.hypothesis/
+.pytest_cache/
+
+# Environments
+.venv
+venv.bak/
+
+# mypy
+.mypy_cache/
+
+# Nix
+.direnv
