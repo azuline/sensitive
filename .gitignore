@@ -32,3 +32,4 @@ venv.bak/
 
 # Nix
 .direnv
+result
