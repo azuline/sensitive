@@ -8,19 +8,25 @@ def cli() -> None:
 
 
 @cli.command()
-def create():
+def create() -> None:
     """Create a new tomb to store files in."""
     pass
 
 
 @cli.command()
-def open():  # noqa
+def resize() -> None:
+    """Resize a tomb (pass new size in MB)."""
+    pass
+
+
+@cli.command()
+def open() -> None:  # noqa
     """Open a tomb in an process-isolated shell."""
     pass
 
 
 @cli.command()
-def mount():
+def mount() -> None:
     """Mount a tomb in a non-isolated directory for use in other programs."""
     pass
 
