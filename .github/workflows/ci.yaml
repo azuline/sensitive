@@ -12,10 +12,10 @@ jobs:
         run: nix build .\#devShell.x86_64-linux
       - name: Typecheck
         if: success() || failure()  # Means that we run all steps even if one fails.
-        run: nix develop ../\#devShells.x86_64-linux.backend --command make typecheck
+        run: nix .\#devShell.x86_64-linux --command make typecheck
       - name: Test
         if: success() || failure()
-        run: nix develop ../\#devShells.x86_64-linux.backend --command make test
+        run: nix .\#devShell.x86_64-linux --command make test
       - name: Lint
         if: success() || failure()
-        run: nix develop ../\#devShells.x86_64-linux.backend --command make lintcheck
+        run: nix .\#devShell.x86_64-linux --command make lintcheck
