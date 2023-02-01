@@ -50,7 +50,7 @@
           meta = {
             description = "a toolchain to securely store and access sensitive files";
             homepage = "https://github.com/azuline/sensitive";
-            license = nixpkgs.lib.licenses.asl20;
+            license = nixpkgs.lib.licenses.gpl3Only;
           };
         };
         devShell = pkgs.mkShell {
