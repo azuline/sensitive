@@ -1,5 +1,5 @@
 {
-  description = "sensitive - a toolchain to securely store and access sensitive files on a computer";
+  description = "sensitive - a toolchain to securely store and access sensitive files";
 
   inputs = {
     nixpkgs.url = github:nixos/nixpkgs/nixos-unstable;
@@ -9,26 +9,22 @@
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
+        pylibs-prod = p: with p; [
+          click
+        ];
+        pylibs-dev = p: (pylibs-prod p) ++ (with p; [
+          black
+          mypy
+        ]);
         # Create a custom Python derivation with the dependencies we need to
         # run sensitive. Add that derivation to `pkgs` via an overlay.
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
-            (self: super:
-              let
-                pylibs-prod = p: with p; [
-                  click
-                ];
-                pylibs-dev = p: (pylibs-prod p) ++ (with p; [
-                  black
-                  mypy
-                ]);
-              in
-              {
-                python = super.python310.withPackages pylibs-prod;
-                python-dev = super.python310.withPackages pylibs-dev;
-              }
-            )
+            (self: super: {
+              python = super.python310.withPackages pylibs-prod;
+              python-dev = super.python310.withPackages pylibs-dev;
+            })
           ];
         };
         # These are non-Python dependencies that we need.
@@ -50,11 +46,11 @@
           version = "0.1.0";
           src = ./.;
           vendorSha256 = "sha256-O9u8ThzGOcfWrDjA87RaOPez8pfqUo+AcciSSAw2sfk=";
-          propagatedBuildInputs = extDeps;
+          propagatedBuildInputs = extDeps ++ pylibs-prod pkgs.python.pkgs;
           meta = {
-            description = "a toolchain to securely store and access sensitive files on a computer";
+            description = "a toolchain to securely store and access sensitive files";
             homepage = "https://github.com/azuline/sensitive";
-            license = nixpkgs.lib.licenses.apache20;
+            license = nixpkgs.lib.licenses.asl20;
           };
         };
         devShell = pkgs.mkShell {
