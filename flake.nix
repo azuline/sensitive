@@ -9,20 +9,36 @@
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        overlay = self: super: {
-          # Create a custom Python derivation with the dependencies we need to
-          # run sensitive.
-          python = super.python310.buildEnv.override {
-            extraLibs = with super.python310.pkgs; [
-              click
-            ];
-          };
-        };
-        # Add the custom Python derivation to our pkgs.
+        # Create a custom Python derivation with the dependencies we need to
+        # run sensitive. Add that derivation to `pkgs` via an overlay.
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [ overlay ];
+          overlays = [
+            (self: super:
+              let
+                pylibs-prod = p: with p; [
+                  click
+                ];
+                pylibs-dev = p: (pylibs-prod p) ++ (with p; [
+                  black
+                  mypy
+                ]);
+              in
+              {
+                python = super.python310.withPackages pylibs-prod;
+                python-dev = super.python310.withPackages pylibs-dev;
+              }
+            )
+          ];
         };
+        # These are non-Python dependencies that we need.
+        extDeps = with pkgs; [
+          bubblewrap
+          tomb
+        ];
+        extDevDeps = with pkgs; [
+          ruff
+        ];
       in
       rec {
         defaultApp = {
@@ -34,11 +50,7 @@
           version = "0.1.0";
           src = ./.;
           vendorSha256 = "sha256-O9u8ThzGOcfWrDjA87RaOPez8pfqUo+AcciSSAw2sfk=";
-          propagatedBuildInputs = [
-            pkgs.python.pkgs.click
-            pkgs.bubblewrap
-            pkgs.tomb
-          ];
+          propagatedBuildInputs = extDeps;
           meta = {
             description = "a toolchain to securely store and access sensitive files on a computer";
             homepage = "https://github.com/azuline/sensitive";
@@ -49,11 +61,7 @@
           buildInputs = [
             (pkgs.buildEnv {
               name = "sensitive-env";
-              paths = with pkgs; [
-                python
-                bubblewrap
-                tomb
-              ];
+              paths = extDeps ++ extDevDeps ++ [ pkgs.python-dev ];
             })
           ];
         };
