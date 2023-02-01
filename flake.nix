@@ -32,9 +32,9 @@
           bubblewrap
           tomb
         ];
-        extDevDeps = with pkgs; [
+        extDevDeps = extDeps ++ (with pkgs; [
           ruff
-        ];
+        ]);
       in
       rec {
         defaultApp = {
@@ -57,7 +57,7 @@
           buildInputs = [
             (pkgs.buildEnv {
               name = "sensitive-env";
-              paths = extDeps ++ extDevDeps ++ [ pkgs.python-dev ];
+              paths = extDevDeps ++ [ pkgs.python-dev ];
             })
           ];
         };
